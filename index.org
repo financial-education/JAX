@@ -1,0 +1,13 @@
+#+title: JAX
+#+author: Matt Brigida, Ph.D.
+#+email: matthew.brigida@sunypoly.edu
+#+PROPERTY: header-args :eval no
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+
+
+
+
+#+name: import
+#+BEGIN_SRC python :exports both :session *jax*
+
+#+end_src
