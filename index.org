@@ -1,13 +1,58 @@
 #+title: JAX
 #+author: Matt Brigida, Ph.D.
 #+email: matthew.brigida@sunypoly.edu
-#+PROPERTY: header-args :eval no
+#+PROPERTY: header-args :eval yes
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 
 
 
 
 #+name: import
-#+BEGIN_SRC python :exports both :session *jax*
+#+BEGIN_SRC python :exports code :session *jax* :results none
+import jax.numpy as jnp
+from jax import grad, jit, vmap
+from jax import random
+import jax.scipy.optimize as sopt
+
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+
+import pandas as pd
+import yfinance as yf
+#+end_src
+
+
+#+name: get_data
+#+BEGIN_SRC python :exports code :session *jax* :results none
+market = yf.Ticker("SPY")
+market_data = market.history(period="1y")
+
+target = yf.Ticker("GME")
+target_data = target.history(period="1y")
+#+end_src
+
+
+#+name: convert_to_returns
+#+BEGIN_SRC python :exports code :session *jax* :results none
+market_returns = market_data["Close"].pct_change()[1:]
+target_returns = target_data["Close"].pct_change()[1:]
+#+end_src
+
+#+name: corr_plot
+#+BEGIN_SRC python :exports code :session *jax* :results none
 
 #+end_src
+
+#+begin_comment
+try linear reg from here:
+https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
+#+end_comment
+
+
+#+name: split
+#+BEGIN_SRC python :exports code :session *jax* :results none
+target_train, target_test, market_train, market_test = train_test_split(target_returns, market_returns)
+#+end_src
+
+
+
