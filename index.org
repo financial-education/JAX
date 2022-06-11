@@ -44,8 +44,6 @@ target_returns = target_data["Close"].pct_change()[1:]
 #+end_src
 
 #+begin_comment
-try linear reg from here:
-https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
 #+end_comment
 
 
@@ -56,3 +54,38 @@ target_train, target_test, market_train, market_test = train_test_split(target_r
 
 
 
+#+BEGIN_SRC python :exports code :session *jax* :results value
+
+## try linear reg from here:
+## https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
+
+# model weights
+params = {
+    'w': jnp.zeros(market_train.shape[1:]),
+    'b': 0.
+}
+
+def forward(params, X):
+    return jnp.dot(market_train, params['w']) + params['b']
+
+
+def loss_fn(params, market_train, target_train):
+    err = forward(params, market_train) - target_train
+    return jnp.mean(jnp.square(err))  # mse
+
+grad_fn = grad(loss_fn)
+
+def update(params, grads):
+    return tree_multimap(lambda p, g: p - 0.05 * g, params, grads)
+
+# the main training loop
+for _ in range(50):
+    loss = loss_fn(params, market_test, target_test)
+    print(loss)
+
+    grads = grad_fn(params, market_train, target_train)
+    params = update(params, grads)
+
+#+end_src
+
+#+RESULTS:
