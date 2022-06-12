@@ -5,87 +5,89 @@
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 
 
+#+begin_comment
+## try linear reg from here:
+## https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
+#+end_comment
 
 
-#+name: import
-#+BEGIN_SRC python :exports code :session *jax* :results none
-import jax.numpy as jnp
-from jax import grad, jit, vmap
-from jax import random
-import jax.scipy.optimize as sopt
-
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-
+#+BEGIN_SRC python :exports both :session *jax* :results values
 import pandas as pd
 import yfinance as yf
-#+end_src
+import jax
+import jax.numpy as jnp
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
 
-
-#+name: get_data
-#+BEGIN_SRC python :exports code :session *jax* :results none
 market = yf.Ticker("SPY")
 market_data = market.history(period="1y")
 
 target = yf.Ticker("GME")
 target_data = target.history(period="1y")
-#+end_src
 
-
-#+name: convert_to_returns
-#+BEGIN_SRC python :exports code :session *jax* :results none
 market_returns = market_data["Close"].pct_change()[1:]
 target_returns = target_data["Close"].pct_change()[1:]
-#+end_src
 
-#+name: corr_plot
-#+BEGIN_SRC python :exports code :session *jax* :results none
-
-#+end_src
-
-#+begin_comment
-#+end_comment
-
-
-#+name: split
-#+BEGIN_SRC python :exports code :session *jax* :results none
-market_train, market_test, target_train, target_test  = train_test_split(market_returns.values, target_returns.values)
-#+end_src
-
-
-
-#+BEGIN_SRC python :exports code :session *jax* :results value
-
-## try linear reg from here:
-## https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
+X, X_test, y, y_test = train_test_split(market_returns.values, target_returns.values)
 
 # model weights
 params = {
-    'w': jnp.zeros(market_train.shape[1:]),
+    'w': jnp.zeros(X.shape[1:]),
     'b': 0.
 }
 
+
 def forward(params, X):
-    return jnp.dot(market_train, params['w']) + params['b']
+    return jnp.dot(X, params['w']) + params['b']
 
 
-def loss_fn(params, market_train, target_train):
-    err = forward(params, market_train) - target_train
+def loss_fn(params, X, y):
+    err = forward(params, X) - y
     return jnp.mean(jnp.square(err))  # mse
 
-grad_fn = grad(loss_fn)
+
+grad_fn = jax.grad(loss_fn)
+
 
 def update(params, grads):
-    return tree_multimap(lambda p, g: p - 0.05 * g, params, grads)
+    return jax.tree_multimap(lambda p, g: p - 0.05 * g, params, grads)
+
 
 # the main training loop
 for _ in range(50):
-    loss = loss_fn(params, market_test, target_test)
+    loss = loss_fn(params, X_test, y_test)
     print(loss)
 
-    grads = grad_fn(params, market_train, target_train)
+    grads = grad_fn(params, X, y)
     params = update(params, grads)
-
+    print(params)
 #+end_src
 
 #+RESULTS:
+
+
+
+#+BEGIN_SRC python :exports both :session *jax* :results output
+print(params)
+#+end_src
+
+#+RESULTS:
+: {'b': DeviceArray(0.00310496, dtype=float32, weak_type=True), 'w': DeviceArray(0.00163073, dtype=float32)}
+
+This has a beta of 0.001, which does not make sense.
+
+
+Check results
+
+#+BEGIN_SRC python :exports both :session *jax* :results output
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression().fit(X.reshape(-1,1), y)
+print(reg.coef_)
+#+end_src
+
+#+RESULTS:
+: [2.40756974]
+
+So a beta of 2.4, which is reasonable.
+
+
