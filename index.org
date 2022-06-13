@@ -1,7 +1,7 @@
 #+title: JAX
 #+author: Matt Brigida, Ph.D.
 #+email: matthew.brigida@sunypoly.edu
-#+PROPERTY: header-args :eval yes
+#+PROPERTY: header-args :eval no
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 
 
@@ -10,15 +10,20 @@
 ## https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
 #+end_comment
 
+Load libraries
 
-#+BEGIN_SRC python :exports both :session *jax* :results values
+#+BEGIN_SRC python :exports both :session *jax* :results none
 import pandas as pd
 import yfinance as yf
 import jax
 import jax.numpy as jnp
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
+#+end_src
 
+Get data
+
+#+BEGIN_SRC python :exports both :session *jax* :results none
 market = yf.Ticker("SPY")
 market_data = market.history(period="1y")
 
@@ -29,10 +34,14 @@ market_returns = market_data["Close"].pct_change()[1:]
 target_returns = target_data["Close"].pct_change()[1:]
 
 X, X_test, y, y_test = train_test_split(market_returns.values, target_returns.values)
+#+end_src
 
+Model
+
+#+BEGIN_SRC python :exports both :session *jax* :results none
 # model weights
 params = {
-    'w': jnp.zeros(X.shape[1:]),
+    'w': 1., #jnp.zeros(X.shape[1:]),
     'b': 0.
 }
 
@@ -50,17 +59,17 @@ grad_fn = jax.grad(loss_fn)
 
 
 def update(params, grads):
-    return jax.tree_multimap(lambda p, g: p - 0.05 * g, params, grads)
+    return jax.tree_multimap(lambda p, g: p - 0.9 * g, params, grads)
 
 
 # the main training loop
-for _ in range(50):
+for _ in range(50000):
     loss = loss_fn(params, X_test, y_test)
-    print(loss)
+#    print(loss)
 
     grads = grad_fn(params, X, y)
     params = update(params, grads)
-    print(params)
+#    print(params)
 #+end_src
 
 #+RESULTS:
@@ -72,9 +81,9 @@ print(params)
 #+end_src
 
 #+RESULTS:
-: {'b': DeviceArray(0.00310496, dtype=float32, weak_type=True), 'w': DeviceArray(0.00163073, dtype=float32)}
+: {'b': DeviceArray(0.00072088, dtype=float32, weak_type=True), 'w': DeviceArray(2.2803657, dtype=float32, weak_type=True)}
 
-This has a beta of 0.001, which does not make sense.
+This has a beta of src_python[:exports results :session *jax* :results output]{print(round(params['w'], 2))} {{{results(=2.28=)}}}, which is reasonable for GME.
 
 
 Check results
@@ -86,8 +95,8 @@ print(reg.coef_)
 #+end_src
 
 #+RESULTS:
-: [2.40756974]
+: [2.28085816]
 
-So a beta of 2.4, which is reasonable.
+So a beta of src_python[:exports results :session *jax* :results output]{print(round(reg.coef_[0], 2))} {{{results(=2.28=)}}}, looks good.
 
 
