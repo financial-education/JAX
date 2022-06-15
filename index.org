@@ -4,6 +4,7 @@
 #+PROPERTY: header-args :eval no
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 
+JAX is a young ML ecosystem that provides simple tools than can be composed to solve complex problems.  It provides Numpy-like functionality on the GPU with **grad** and vectorization methods.  Below we'll use JAX to estimate a market model.
 
 #+begin_comment
 ## try linear reg from here:
@@ -21,7 +22,7 @@ from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 #+end_src
 
-Get data
+Get data from Yahoo Finance, convert them into returns, and split into training and test data sets.
 
 #+BEGIN_SRC python :exports both :session *jax* :results none
 market = yf.Ticker("SPY")
@@ -47,11 +48,11 @@ params = {
 
 
 def forward(params, X):
-    return jnp.dot(X, params['w']) + params['b']
+    return jnp.dot(X, params['w']) + params['b']  # calculates y_hat
 
 
 def loss_fn(params, X, y):
-    err = forward(params, X) - y
+    err = forward(params, X) - y  # y_hat - y
     return jnp.mean(jnp.square(err))  # mse
 
 

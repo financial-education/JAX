@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-06-12 Sun 22:33 -->
+<!-- 2022-06-15 Wed 11:02 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JAX</title>
@@ -20,6 +20,10 @@
 <div id="content" class="content">
 <h1 class="title">JAX</h1>
 <p>
+JAX is a young ML ecosystem that provides simple tools than can be composed to solve complex problems.  It provides Numpy-like functionality on the GPU with <b><b>grad</b></b> and vectorization methods.  Below we'll use JAX to estimate a market model.
+</p>
+
+<p>
 Load libraries
 </p>
 
@@ -34,7 +38,7 @@ Load libraries
 </div>
 
 <p>
-Get data
+Get data from Yahoo Finance, convert them into returns, and split into training and test data sets.
 </p>
 
 <div class="org-src-container">
@@ -64,11 +68,11 @@ Model
 
 
 <span style="color: #00ffff; font-weight: bold;">def</span> <span style="color: #0000ff; font-weight: bold;">forward</span>(params, X):
-    <span style="color: #00ffff; font-weight: bold;">return</span> jnp.dot(X, params[<span style="color: #00ff00;">'w'</span>]) + params[<span style="color: #00ff00;">'b'</span>]
+    <span style="color: #00ffff; font-weight: bold;">return</span> jnp.dot(X, params[<span style="color: #00ff00;">'w'</span>]) + params[<span style="color: #00ff00;">'b'</span>]  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">calculates y_hat</span>
 
 
 <span style="color: #00ffff; font-weight: bold;">def</span> <span style="color: #0000ff; font-weight: bold;">loss_fn</span>(params, X, y):
-    <span style="color: #ffff00;">err</span> = forward(params, X) - y
+    <span style="color: #ffff00;">err</span> = forward(params, X) - y  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">y_hat - y</span>
     <span style="color: #00ffff; font-weight: bold;">return</span> jnp.mean(jnp.square(err))  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">mse</span>
 
 
@@ -127,7 +131,7 @@ So a beta of <code>2.28</code>, looks good.
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Matt Brigida, Ph.D.</p>
-<p class="date">Created: 2022-06-12 Sun 22:33</p>
+<p class="date">Created: 2022-06-15 Wed 11:02</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
