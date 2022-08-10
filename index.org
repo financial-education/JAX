@@ -3,6 +3,7 @@
 #+email: matthew.brigida@sunypoly.edu
 #+PROPERTY: header-args :eval no
 #+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
 
 JAX is a young ML ecosystem that provides simple tools than can be composed to solve complex problems.  It provides Numpy-like functionality on the GPU with **grad** and vectorization methods.  Below we'll use JAX to estimate a market model.
 
@@ -11,7 +12,7 @@ JAX is a young ML ecosystem that provides simple tools than can be composed to s
 ## https://coax.readthedocs.io/en/latest/examples/linear_regression/jax.html
 #+end_comment
 
-Load libraries
+Load libraries:
 
 #+BEGIN_SRC python :exports both :session *jax* :results none
 import pandas as pd

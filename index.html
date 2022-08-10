@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-06-15 Wed 11:02 -->
+<!-- 2022-08-10 Wed 11:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>JAX</title>
@@ -15,6 +15,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
 <script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+<style>pre.src{background:#343131;color:white;} </style>
 </head>
 <body>
 <div id="content" class="content">
@@ -24,16 +25,16 @@ JAX is a young ML ecosystem that provides simple tools than can be composed to s
 </p>
 
 <p>
-Load libraries
+Load libraries:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #00ffff; font-weight: bold;">import</span> pandas <span style="color: #00ffff; font-weight: bold;">as</span> pd
-<span style="color: #00ffff; font-weight: bold;">import</span> yfinance <span style="color: #00ffff; font-weight: bold;">as</span> yf
-<span style="color: #00ffff; font-weight: bold;">import</span> jax
-<span style="color: #00ffff; font-weight: bold;">import</span> jax.numpy <span style="color: #00ffff; font-weight: bold;">as</span> jnp
-<span style="color: #00ffff; font-weight: bold;">from</span> sklearn.datasets <span style="color: #00ffff; font-weight: bold;">import</span> make_regression
-<span style="color: #00ffff; font-weight: bold;">from</span> sklearn.model_selection <span style="color: #00ffff; font-weight: bold;">import</span> train_test_split
+<pre class="src src-python"><span style="color: #51afef;">import</span> pandas <span style="color: #51afef;">as</span> pd
+<span style="color: #51afef;">import</span> yfinance <span style="color: #51afef;">as</span> yf
+<span style="color: #51afef;">import</span> jax
+<span style="color: #51afef;">import</span> jax.numpy <span style="color: #51afef;">as</span> jnp
+<span style="color: #51afef;">from</span> sklearn.datasets <span style="color: #51afef;">import</span> make_regression
+<span style="color: #51afef;">from</span> sklearn.model_selection <span style="color: #51afef;">import</span> train_test_split
 </pre>
 </div>
 
@@ -42,16 +43,16 @@ Get data from Yahoo Finance, convert them into returns, and split into training 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ffff00;">market</span> = yf.Ticker(<span style="color: #00ff00;">"SPY"</span>)
-<span style="color: #ffff00;">market_data</span> = market.history(period=<span style="color: #00ff00;">"1y"</span>)
+<pre class="src src-python"><span style="color: #dcaeea;">market</span> = yf.Ticker(<span style="color: #98be65;">"SPY"</span>)
+<span style="color: #dcaeea;">market_data</span> = market.history(period=<span style="color: #98be65;">"1y"</span>)
 
-target = yf.Ticker(<span style="color: #00ff00;">"GME"</span>)
-target_data = target.history(period=<span style="color: #00ff00;">"1y"</span>)
+target = yf.Ticker(<span style="color: #98be65;">"GME"</span>)
+target_data = target.history(period=<span style="color: #98be65;">"1y"</span>)
 
-market_returns = market_data[<span style="color: #00ff00;">"Close"</span>].pct_change()[1:]
-target_returns = target_data[<span style="color: #00ff00;">"Close"</span>].pct_change()[1:]
+market_returns = market_data[<span style="color: #98be65;">"Close"</span>].pct_change()[1:]
+target_returns = target_data[<span style="color: #98be65;">"Close"</span>].pct_change()[1:]
 
-<span style="color: #ffff00;">X</span>, <span style="color: #ffff00;">X_test</span>, <span style="color: #ffff00;">y</span>, <span style="color: #ffff00;">y_test</span> = train_test_split(market_returns.values, target_returns.values)
+<span style="color: #dcaeea;">X</span>, <span style="color: #dcaeea;">X_test</span>, <span style="color: #dcaeea;">y</span>, <span style="color: #dcaeea;">y_test</span> = train_test_split(market_returns.values, target_returns.values)
 </pre>
 </div>
 
@@ -60,42 +61,42 @@ Model
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #ff0000;"># </span><span style="color: #ff0000;">model weights</span>
-<span style="color: #ffff00;">params</span> = {
-    <span style="color: #00ff00;">'w'</span>: 1., <span style="color: #ff0000;">#</span><span style="color: #ff0000;">jnp.zeros(X.shape[1:]),</span>
-    <span style="color: #00ff00;">'b'</span>: 0.
+<pre class="src src-python"><span style="color: #5B6268;"># </span><span style="color: #5B6268;">model weights</span>
+<span style="color: #dcaeea;">params</span> = {
+    <span style="color: #98be65;">'w'</span>: 1., <span style="color: #5B6268;">#</span><span style="color: #5B6268;">jnp.zeros(X.shape[1:]),</span>
+    <span style="color: #98be65;">'b'</span>: 0.
 }
 
 
-<span style="color: #00ffff; font-weight: bold;">def</span> <span style="color: #0000ff; font-weight: bold;">forward</span>(params, X):
-    <span style="color: #00ffff; font-weight: bold;">return</span> jnp.dot(X, params[<span style="color: #00ff00;">'w'</span>]) + params[<span style="color: #00ff00;">'b'</span>]  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">calculates y_hat</span>
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">forward</span>(params, X):
+    <span style="color: #51afef;">return</span> jnp.dot(X, params[<span style="color: #98be65;">'w'</span>]) + params[<span style="color: #98be65;">'b'</span>]  <span style="color: #5B6268;"># </span><span style="color: #5B6268;">calculates y_hat</span>
 
 
-<span style="color: #00ffff; font-weight: bold;">def</span> <span style="color: #0000ff; font-weight: bold;">loss_fn</span>(params, X, y):
-    <span style="color: #ffff00;">err</span> = forward(params, X) - y  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">y_hat - y</span>
-    <span style="color: #00ffff; font-weight: bold;">return</span> jnp.mean(jnp.square(err))  <span style="color: #ff0000;"># </span><span style="color: #ff0000;">mse</span>
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">loss_fn</span>(params, X, y):
+    <span style="color: #dcaeea;">err</span> = forward(params, X) - y  <span style="color: #5B6268;"># </span><span style="color: #5B6268;">y_hat - y</span>
+    <span style="color: #51afef;">return</span> jnp.mean(jnp.square(err))  <span style="color: #5B6268;"># </span><span style="color: #5B6268;">mse</span>
 
 
-<span style="color: #ffff00;">grad_fn</span> = jax.grad(loss_fn)
+<span style="color: #dcaeea;">grad_fn</span> = jax.grad(loss_fn)
 
 
-<span style="color: #00ffff; font-weight: bold;">def</span> <span style="color: #0000ff; font-weight: bold;">update</span>(params, grads):
-    <span style="color: #00ffff; font-weight: bold;">return</span> jax.tree_multimap(<span style="color: #00ffff; font-weight: bold;">lambda</span> p, g: p - 0.9 * g, params, grads)
+<span style="color: #51afef;">def</span> <span style="color: #c678dd;">update</span>(params, grads):
+    <span style="color: #51afef;">return</span> jax.tree_multimap(<span style="color: #51afef;">lambda</span> p, g: p - 0.9 * g, params, grads)
 
 
-<span style="color: #ff0000;"># </span><span style="color: #ff0000;">the main training loop</span>
-<span style="color: #00ffff; font-weight: bold;">for</span> _ <span style="color: #00ffff; font-weight: bold;">in</span> <span style="color: #0000ff; font-weight: bold;">range</span>(50000):
-    <span style="color: #ffff00;">loss</span> = loss_fn(params, X_test, y_test)
-<span style="color: #ff0000;">#    </span><span style="color: #ff0000;">print(loss)</span>
+<span style="color: #5B6268;"># </span><span style="color: #5B6268;">the main training loop</span>
+<span style="color: #51afef;">for</span> _ <span style="color: #51afef;">in</span> <span style="color: #c678dd;">range</span>(50000):
+    <span style="color: #dcaeea;">loss</span> = loss_fn(params, X_test, y_test)
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">print(loss)</span>
 
-    <span style="color: #ffff00;">grads</span> = grad_fn(params, X, y)
-    <span style="color: #ffff00;">params</span> = update(params, grads)
-<span style="color: #ff0000;">#    </span><span style="color: #ff0000;">print(params)</span>
+    <span style="color: #dcaeea;">grads</span> = grad_fn(params, X, y)
+    <span style="color: #dcaeea;">params</span> = update(params, grads)
+<span style="color: #5B6268;">#    </span><span style="color: #5B6268;">print(params)</span>
 </pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #0000ff; font-weight: bold;">print</span>(params)
+<pre class="src src-python"><span style="color: #c678dd;">print</span>(params)
 </pre>
 </div>
 
@@ -114,9 +115,9 @@ Check results
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #00ffff; font-weight: bold;">from</span> sklearn.linear_model <span style="color: #00ffff; font-weight: bold;">import</span> LinearRegression
-<span style="color: #ffff00;">reg</span> = LinearRegression().fit(X.reshape(-1,1), y)
-<span style="color: #0000ff; font-weight: bold;">print</span>(reg.coef_)
+<pre class="src src-python"><span style="color: #51afef;">from</span> sklearn.linear_model <span style="color: #51afef;">import</span> LinearRegression
+<span style="color: #dcaeea;">reg</span> = LinearRegression().fit(X.reshape(-1,1), y)
+<span style="color: #c678dd;">print</span>(reg.coef_)
 </pre>
 </div>
 
@@ -131,7 +132,7 @@ So a beta of <code>2.28</code>, looks good.
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Matt Brigida, Ph.D.</p>
-<p class="date">Created: 2022-06-15 Wed 11:02</p>
+<p class="date">Created: 2022-08-10 Wed 11:50</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
